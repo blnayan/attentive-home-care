@@ -1,31 +1,92 @@
-import Image from "next/image"
-import Link from "next/link"
-import { Check, Heart, Home, Phone, Mail, Clock, Shield } from "lucide-react"
-import { Button } from "@/components/ui/button"
+"use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Check, Heart, Home, Phone, Mail, Clock, Shield } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function HomePage() {
+  const [activeSection, setActiveSection] = useState("home");
+
+  useEffect(() => {
+    const sectionIds = ["home", "about", "services", "contact"];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      {
+        rootMargin: "-40% 0px -40% 0px",
+        threshold: 0.1,
+      }
+    );
+
+    sectionIds.forEach((id) => {
+      const element = document.getElementById(id);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const navLinks = [
+    { id: "about", label: "About Us", href: "#about" },
+    { id: "services", label: "Services", href: "#services" },
+    { id: "contact", label: "Contact", href: "#contact" },
+  ];
+
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-50 w-full border-b bg-white">
         <div className="container mx-auto px-4 flex h-16 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Heart className="h-6 w-6 text-rose-600" />
-            <span className="text-xl font-bold text-green-700">Attentive Home Care, Inc.</span>
-          </div>
-          <nav className="hidden md:flex gap-6">
-            <Link href="#home" className="text-sm font-medium hover:text-green-700">
-              Home
+          <nav className="hidden md:flex items-center gap-6">
+            <Link
+              href="#home"
+              className={cn(
+                "group flex items-center gap-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600",
+                activeSection === "home"
+                  ? "text-green-800"
+                  : "text-green-700 hover:text-green-800"
+              )}
+              aria-label="Go to Attentive Home Care home section"
+              aria-current={activeSection === "home" ? "page" : undefined}
+            >
+              <Heart className="h-6 w-6 text-rose-600" />
+              <span
+                className={cn(
+                  "text-xl font-bold transition-colors group-hover:text-green-800",
+                  activeSection === "home" ? "text-green-800" : "text-green-700"
+                )}
+              >
+                Attentive Home Care, Inc.
+              </span>
             </Link>
-            <Link href="#about" className="text-sm font-medium hover:text-green-700">
-              About Us
-            </Link>
-            <Link href="#services" className="text-sm font-medium hover:text-green-700">
-              Services
-            </Link>
-            <Link href="#contact" className="text-sm font-medium hover:text-green-700">
-              Contact
-            </Link>
-            <Link href="/book_appointment" className="text-sm font-medium hover:text-green-700">
+            {navLinks.map((link) => (
+              <Link
+                key={link.id}
+                href={link.href}
+                className={cn(
+                  "text-sm font-medium transition-colors",
+                  activeSection === link.id
+                    ? "text-green-800 underline decoration-2 decoration-green-700 underline-offset-4"
+                    : "text-gray-600 hover:text-green-700"
+                )}
+                aria-current={activeSection === link.id ? "page" : undefined}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Link
+              href="/book_appointment"
+              className="text-sm font-medium hover:text-green-700"
+            >
               Book a Time
             </Link>
           </nav>
@@ -55,25 +116,34 @@ export default function HomePage() {
         </div>
       </header>
       <main className="flex-1">
-        <section id="home" className="relative bg-gradient-to-r from-green-50 to-rose-50 py-20">
-          <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-8">
-            <div className="flex-1 space-y-6">
+        <section
+          id="home"
+          className="relative bg-gradient-to-r from-green-50 to-rose-50 py-20"
+        >
+          <div className="container mx-auto px-4 flex flex-col md: md:flex-row items-center md:gap-50 gap-10">
+            <div className="space-y-6">
               <h1 className="text-4xl md:text-5xl font-bold text-green-800">
                 Compassionate Home Care for Your Loved Ones
               </h1>
               <p className="text-lg text-gray-600">
-                Providing high-quality non-medical home care services that improve the quality of life for every client.
+                Providing high-quality non-medical home care services that
+                improve the quality of life for every client.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button className="bg-green-700 hover:bg-green-800 text-white">Our Services</Button>
-                <Button variant="outline" className="border-rose-600 text-rose-600 hover:bg-rose-50 bg-transparent">
+                <Button className="bg-green-700 hover:bg-green-800 text-white">
+                  Our Services
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-rose-600 text-rose-600 hover:bg-rose-50 bg-transparent"
+                >
                   <Phone className="mr-2 h-4 w-4" /> 571-449-6448
                 </Button>
               </div>
             </div>
-            <div className="flex-1">
+            <div className="flex-none">
               <Image
-                src="https://media.istockphoto.com/id/1719538017/photo/home-care-healthcare-professional-hugging-senior-patient.jpg?s=612x612&w=0&k=20&c=DTQwVD1DTH0CMQ78aox8-cVKg8Nl-wCkSwY-S072M4E="
+                src="/hero-caregiver.jpg"
                 alt="Caregiver helping senior at home"
                 width={500}
                 height={400}
@@ -91,20 +161,28 @@ export default function HomePage() {
                 <div className="inline-block rounded-lg bg-green-100 px-3 py-1 text-sm text-green-800 font-medium">
                   Our Mission
                 </div>
-                <h2 className="text-3xl font-bold text-green-800">Improving Quality of Life</h2>
+                <h2 className="text-3xl font-bold text-green-800">
+                  Improving Quality of Life
+                </h2>
                 <p className="text-gray-600">
-                  It is our mission to deliver high standard, budget-friendly, and personalized non-medical homecare
-                  services that will improve the quality of life of every client that we encounter. We endeavor to help
-                  our clients live a healthier, safer, and more independent life at home.
+                  It is our mission to deliver high standard, budget-friendly,
+                  and personalized non-medical homecare services that will
+                  improve the quality of life of every client that we encounter.
+                  We endeavor to help our clients live a healthier, safer, and
+                  more independent life at home.
                 </p>
                 <div className="pt-4">
                   <div className="inline-block rounded-lg bg-rose-100 px-3 py-1 text-sm text-rose-800 font-medium">
                     Our Vision
                   </div>
-                  <h2 className="mt-2 text-3xl font-bold text-rose-700">Exceeding Expectations</h2>
+                  <h2 className="mt-2 text-3xl font-bold text-rose-700">
+                    Exceeding Expectations
+                  </h2>
                   <p className="mt-4 text-gray-600">
-                    We endeavor to use the latest techniques and advances in non-medical home care so that we can exceed
-                    our client's expectations and become one of Virginia's top non-medical home care providers.
+                    We endeavor to use the latest techniques and advances in
+                    non-medical home care so that we can exceed our client's
+                    expectations and become one of Virginia's top non-medical
+                    home care providers.
                   </p>
                 </div>
               </div>
@@ -127,11 +205,14 @@ export default function HomePage() {
               <div className="inline-block rounded-lg bg-rose-100 px-3 py-1 text-sm text-rose-800 font-medium">
                 Our Services
               </div>
-              <h2 className="mt-2 text-3xl font-bold text-rose-700">Personalized Care Services</h2>
+              <h2 className="mt-2 text-3xl font-bold text-rose-700">
+                Personalized Care Services
+              </h2>
               <p className="mt-4 max-w-2xl mx-auto text-gray-600">
-                If you are looking for high-quality non-medical home care services, you can rely on Attentive Home Care,
-                Inc. to provide what you need. Our caregivers will thoroughly evaluate your situation, and attentively
-                listen to your requests.
+                If you are looking for high-quality non-medical home care
+                services, you can rely on Attentive Home Care, Inc. to provide
+                what you need. Our caregivers will thoroughly evaluate your
+                situation, and attentively listen to your requests.
               </p>
             </div>
 
@@ -140,9 +221,12 @@ export default function HomePage() {
                 <div className="h-12 w-12 bg-rose-100 rounded-full flex items-center justify-center mb-4">
                   <Heart className="h-6 w-6 text-rose-600" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800">Companionship</h3>
+                <h3 className="text-xl font-bold text-gray-800">
+                  Companionship
+                </h3>
                 <p className="mt-2 text-gray-600">
-                  Friendly conversation, emotional support, and social engagement for your loved ones.
+                  Friendly conversation, emotional support, and social
+                  engagement for your loved ones.
                 </p>
               </div>
 
@@ -152,8 +236,8 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-xl font-bold text-gray-800">Homemaking</h3>
                 <p className="mt-2 text-gray-600">
-                  Light housekeeping, meal preparation, and other household tasks to maintain a comfortable living
-                  environment.
+                  Light housekeeping, meal preparation, and other household
+                  tasks to maintain a comfortable living environment.
                 </p>
               </div>
 
@@ -161,9 +245,12 @@ export default function HomePage() {
                 <div className="h-12 w-12 bg-rose-100 rounded-full flex items-center justify-center mb-4">
                   <Shield className="h-6 w-6 text-rose-600" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800">Personal Care</h3>
+                <h3 className="text-xl font-bold text-gray-800">
+                  Personal Care
+                </h3>
                 <p className="mt-2 text-gray-600">
-                  Assistance with activities of daily living such as bathing, dressing, and personal hygiene.
+                  Assistance with activities of daily living such as bathing,
+                  dressing, and personal hygiene.
                 </p>
               </div>
 
@@ -171,16 +258,20 @@ export default function HomePage() {
                 <div className="h-12 w-12 bg-rose-100 rounded-full flex items-center justify-center mb-4">
                   <Clock className="h-6 w-6 text-rose-600" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800">Respite Care</h3>
+                <h3 className="text-xl font-bold text-gray-800">
+                  Respite Care
+                </h3>
                 <p className="mt-2 text-gray-600">
-                  Temporary relief for family caregivers to rest and recharge while ensuring your loved one receives
-                  quality care.
+                  Temporary relief for family caregivers to rest and recharge
+                  while ensuring your loved one receives quality care.
                 </p>
               </div>
             </div>
 
             <div className="mt-12 text-center">
-              <Button className="bg-rose-600 hover:bg-rose-700">Learn More About Our Services</Button>
+              <Button className="bg-rose-600 hover:bg-rose-700">
+                Learn More About Our Services
+              </Button>
             </div>
           </div>
         </section>
@@ -198,16 +289,21 @@ export default function HomePage() {
                 />
               </div>
               <div className="space-y-6">
-                <h2 className="text-3xl font-bold text-green-800">Why Choose Attentive Home Care?</h2>
+                <h2 className="text-3xl font-bold text-green-800">
+                  Why Choose Attentive Home Care?
+                </h2>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
                     <div className="h-6 w-6 mt-0.5 bg-green-100 rounded-full flex items-center justify-center">
                       <Check className="h-4 w-4 text-green-700" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-800">Personalized Care Plans</h3>
+                      <h3 className="font-semibold text-gray-800">
+                        Personalized Care Plans
+                      </h3>
                       <p className="text-gray-600">
-                        Customized care plans tailored to your specific needs and preferences.
+                        Customized care plans tailored to your specific needs
+                        and preferences.
                       </p>
                     </div>
                   </div>
@@ -217,9 +313,12 @@ export default function HomePage() {
                       <Check className="h-4 w-4 text-green-700" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-800">Experienced Caregivers</h3>
+                      <h3 className="font-semibold text-gray-800">
+                        Experienced Caregivers
+                      </h3>
                       <p className="text-gray-600">
-                        Our caregivers are thoroughly screened, trained, and compassionate professionals.
+                        Our caregivers are thoroughly screened, trained, and
+                        compassionate professionals.
                       </p>
                     </div>
                   </div>
@@ -229,9 +328,12 @@ export default function HomePage() {
                       <Check className="h-4 w-4 text-green-700" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-800">Budget-Friendly Options</h3>
+                      <h3 className="font-semibold text-gray-800">
+                        Budget-Friendly Options
+                      </h3>
                       <p className="text-gray-600">
-                        Affordable care solutions without compromising on quality or service.
+                        Affordable care solutions without compromising on
+                        quality or service.
                       </p>
                     </div>
                   </div>
@@ -241,9 +343,12 @@ export default function HomePage() {
                       <Check className="h-4 w-4 text-green-700" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-800">Available When You Need Us</h3>
+                      <h3 className="font-semibold text-gray-800">
+                        Available When You Need Us
+                      </h3>
                       <p className="text-gray-600">
-                        Flexible scheduling to accommodate your needs, including evenings and weekends.
+                        Flexible scheduling to accommodate your needs, including
+                        evenings and weekends.
                       </p>
                     </div>
                   </div>
@@ -259,10 +364,13 @@ export default function HomePage() {
               <div className="inline-block rounded-lg bg-green-100 px-3 py-1 text-sm text-green-800 font-medium">
                 Contact Us
               </div>
-              <h2 className="mt-2 text-3xl font-bold text-green-800">Get In Touch</h2>
+              <h2 className="mt-2 text-3xl font-bold text-green-800">
+                Get In Touch
+              </h2>
               <p className="mt-4 max-w-2xl mx-auto text-gray-600">
-                We encourage you to call us or set an appointment if you have further questions or need clarifications
-                regarding our services at Attentive Home Care, Inc.
+                We encourage you to call us or set an appointment if you have
+                further questions or need clarifications regarding our services
+                at Attentive Home Care, Inc.
               </p>
             </div>
 
@@ -281,7 +389,9 @@ export default function HomePage() {
                   <Mail className="h-6 w-6 text-green-700" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-800">Email</h3>
-                <p className="mt-2 text-gray-600">attentivehomecare55@gmail.com</p>
+                <p className="mt-2 text-gray-600">
+                  attentivehomecare55@gmail.com
+                </p>
                 <p className="text-gray-600">www.attentivehomecareva.com</p>
               </div>
 
@@ -290,13 +400,17 @@ export default function HomePage() {
                   <Home className="h-6 w-6 text-green-700" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-800">Location</h3>
-                <p className="mt-2 text-gray-600">Serving the Northern Virginia area</p>
+                <p className="mt-2 text-gray-600">
+                  Serving the Northern Virginia area
+                </p>
                 <p className="text-gray-600">Call for a free consultation</p>
               </div>
             </div>
 
             <div className="mt-12 text-center">
-              <Button className="bg-green-700 hover:bg-green-800">Schedule a Consultation</Button>
+              <Button className="bg-green-700 hover:bg-green-800">
+                Schedule a Consultation
+              </Button>
             </div>
           </div>
         </section>
@@ -305,8 +419,8 @@ export default function HomePage() {
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold">Ready to Get Started?</h2>
             <p className="mt-4 max-w-2xl mx-auto">
-              Contact us today to learn more about our services and how we can help improve the quality of life for you
-              or your loved one.
+              Contact us today to learn more about our services and how we can
+              help improve the quality of life for you or your loved one.
             </p>
             <div className="mt-8">
               <Button className="bg-white text-rose-600 hover:bg-gray-100">
@@ -322,10 +436,13 @@ export default function HomePage() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Heart className="h-6 w-6 text-rose-500" />
-                <span className="text-xl font-bold">Attentive Home Care, Inc.</span>
+                <span className="text-xl font-bold">
+                  Attentive Home Care, Inc.
+                </span>
               </div>
               <p className="text-gray-400">
-                Providing high-quality non-medical home care services to improve the quality of life for our clients.
+                Providing high-quality non-medical home care services to improve
+                the quality of life for our clients.
               </p>
             </div>
             <div>
@@ -337,17 +454,26 @@ export default function HomePage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="#about" className="text-gray-400 hover:text-white">
+                  <Link
+                    href="#about"
+                    className="text-gray-400 hover:text-white"
+                  >
                     About Us
                   </Link>
                 </li>
                 <li>
-                  <Link href="#services" className="text-gray-400 hover:text-white">
+                  <Link
+                    href="#services"
+                    className="text-gray-400 hover:text-white"
+                  >
                     Services
                   </Link>
                 </li>
                 <li>
-                  <Link href="#contact" className="text-gray-400 hover:text-white">
+                  <Link
+                    href="#contact"
+                    className="text-gray-400 hover:text-white"
+                  >
                     Contact
                   </Link>
                 </li>
@@ -360,10 +486,14 @@ export default function HomePage() {
                   <Phone className="h-4 w-4 text-rose-500" /> 571-449-6448
                 </li>
                 <li className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-rose-500" /> attentivehomecare55@gmail.com
+                  <Mail className="h-4 w-4 text-rose-500" />{" "}
+                  attentivehomecare55@gmail.com
                 </li>
                 <li>
-                  <Link href="http://www.attentivehomecareva.com" className="text-gray-400 hover:text-white">
+                  <Link
+                    href="http://www.attentivehomecareva.com"
+                    className="text-gray-400 hover:text-white"
+                  >
                     www.attentivehomecareva.com
                   </Link>
                 </li>
@@ -371,10 +501,13 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; {new Date().getFullYear()} Attentive Home Care, Inc. All rights reserved.</p>
+            <p>
+              &copy; {new Date().getFullYear()} Attentive Home Care, Inc. All
+              rights reserved.
+            </p>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }
