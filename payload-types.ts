@@ -67,6 +67,7 @@ export interface Config {
   };
   blocks: {};
   collections: {
+    media: Media;
     users: User;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -74,6 +75,7 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
+    media: MediaSelect<false> | MediaSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -82,8 +84,12 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'home-page': HomePage;
+  };
+  globalsSelect: {
+    'home-page': HomePageSelect<false> | HomePageSelect<true>;
+  };
   locale: null;
   user: User & {
     collection: 'users';
@@ -109,6 +115,43 @@ export interface UserAuthOperations {
   unlock: {
     email: string;
     password: string;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  alt: string;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
   };
 }
 /**
@@ -141,10 +184,15 @@ export interface User {
  */
 export interface PayloadLockedDocument {
   id: number;
-  document?: {
-    relationTo: 'users';
-    value: number | User;
-  } | null;
+  document?:
+    | ({
+        relationTo: 'media';
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'users';
+        value: number | User;
+      } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
@@ -186,6 +234,48 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -240,6 +330,284 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home-page".
+ */
+export interface HomePage {
+  id: number;
+  navigation: {
+    logoText: string;
+    logoImage?: (number | null) | Media;
+    links?:
+      | {
+          label: string;
+          href: string;
+          id?: string | null;
+        }[]
+      | null;
+    cta?: {
+      label?: string | null;
+      href?: string | null;
+    };
+    phoneButton?: {
+      label?: string | null;
+      href?: string | null;
+    };
+  };
+  hero: {
+    title: string;
+    description: string;
+    primaryAction?: {
+      label?: string | null;
+      href?: string | null;
+    };
+    secondaryAction?: {
+      label?: string | null;
+      href?: string | null;
+      icon?: ('heart' | 'home' | 'shield' | 'clock' | 'check' | 'phone' | 'mail') | null;
+    };
+    image?: (number | null) | Media;
+  };
+  about?: {
+    missionBadge?: string | null;
+    missionTitle?: string | null;
+    missionDescription?: string | null;
+    visionBadge?: string | null;
+    visionTitle?: string | null;
+    visionDescription?: string | null;
+  };
+  servicesSection?: {
+    badge?: string | null;
+    title?: string | null;
+    description?: string | null;
+    cards?:
+      | {
+          icon?: ('heart' | 'home' | 'shield' | 'clock' | 'check' | 'phone' | 'mail') | null;
+          title: string;
+          description?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    cta?: {
+      label?: string | null;
+      href?: string | null;
+    };
+  };
+  whyChoose?: {
+    image?: (number | null) | Media;
+    title?: string | null;
+    features?:
+      | {
+          icon?: ('heart' | 'home' | 'shield' | 'clock' | 'check' | 'phone' | 'mail') | null;
+          title?: string | null;
+          description?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  contact?: {
+    title?: string | null;
+    description?: string | null;
+    cards?:
+      | {
+          icon?: ('heart' | 'home' | 'shield' | 'clock' | 'check' | 'phone' | 'mail') | null;
+          title?: string | null;
+          lines?:
+            | {
+                value: string;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+    cta?: {
+      label?: string | null;
+      href?: string | null;
+      icon?: ('heart' | 'home' | 'shield' | 'clock' | 'check' | 'phone' | 'mail') | null;
+    };
+  };
+  closingCta?: {
+    title?: string | null;
+    description?: string | null;
+    buttonLabel?: string | null;
+    buttonHref?: string | null;
+    buttonIcon?: ('heart' | 'home' | 'shield' | 'clock' | 'check' | 'phone' | 'mail') | null;
+  };
+  footer?: {
+    logoText?: string | null;
+    description?: string | null;
+    quickLinks?:
+      | {
+          label?: string | null;
+          href?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    contact?: {
+      phone?: string | null;
+      email?: string | null;
+      website?: string | null;
+    };
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home-page_select".
+ */
+export interface HomePageSelect<T extends boolean = true> {
+  navigation?:
+    | T
+    | {
+        logoText?: T;
+        logoImage?: T;
+        links?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        cta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        phoneButton?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+      };
+  hero?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        primaryAction?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        secondaryAction?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              icon?: T;
+            };
+        image?: T;
+      };
+  about?:
+    | T
+    | {
+        missionBadge?: T;
+        missionTitle?: T;
+        missionDescription?: T;
+        visionBadge?: T;
+        visionTitle?: T;
+        visionDescription?: T;
+      };
+  servicesSection?:
+    | T
+    | {
+        badge?: T;
+        title?: T;
+        description?: T;
+        cards?:
+          | T
+          | {
+              icon?: T;
+              title?: T;
+              description?: T;
+              id?: T;
+            };
+        cta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+      };
+  whyChoose?:
+    | T
+    | {
+        image?: T;
+        title?: T;
+        features?:
+          | T
+          | {
+              icon?: T;
+              title?: T;
+              description?: T;
+              id?: T;
+            };
+      };
+  contact?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        cards?:
+          | T
+          | {
+              icon?: T;
+              title?: T;
+              lines?:
+                | T
+                | {
+                    value?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        cta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              icon?: T;
+            };
+      };
+  closingCta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        buttonLabel?: T;
+        buttonHref?: T;
+        buttonIcon?: T;
+      };
+  footer?:
+    | T
+    | {
+        logoText?: T;
+        description?: T;
+        quickLinks?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        contact?:
+          | T
+          | {
+              phone?: T;
+              email?: T;
+              website?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
