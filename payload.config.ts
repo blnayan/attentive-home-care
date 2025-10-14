@@ -1,6 +1,7 @@
 import sharp from "sharp";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { postgresAdapter } from "@payloadcms/db-postgres";
+import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { buildConfig } from "payload";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -23,5 +24,16 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL || "",
     },
   }),
+  plugins: [
+    vercelBlobStorage({
+      enabled: process.env.NODE_ENVIRONMENT === "production",
+      collections: {
+        media: true,
+      },
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    }),
+  ],
   sharp,
+  cors: [process.env.PAYLOAD_PUBLIC_SERVER_URL || ""].filter(Boolean),
+  csrf: [process.env.PAYLOAD_PUBLIC_SERVER_URL || ""].filter(Boolean),
 });
