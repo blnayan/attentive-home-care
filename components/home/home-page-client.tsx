@@ -219,7 +219,7 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
             <Link
               href="#home"
               className={cn(
-                "group flex items-center gap-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600",
+                "group flex items-center gap-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600",
                 activeSection === "home"
                   ? "text-green-800"
                   : "text-green-700 hover:text-green-800"
