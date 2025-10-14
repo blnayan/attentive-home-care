@@ -10,7 +10,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  ignoreDuringBuilds: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default withPayload(nextConfig);
