@@ -151,13 +151,9 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
   const footer = data.footer ?? {};
 
   const navLinks = navigation.links ?? [];
-  const navigationLogoText =
-    navigation.logoText ?? "Attentive Home Care, Inc.";
+  const navigationLogoText = navigation.logoText ?? "Attentive Home Care, Inc.";
   const headerNavLinks: NavLinkItem[] = navLinks
-    .filter(
-      (link): link is LinkItem & { label: string } =>
-        Boolean(link.label)
-    )
+    .filter((link): link is LinkItem & { label: string } => Boolean(link.label))
     .map((link) => {
       const href = normalizeHref(link.href);
       const sectionId = href.startsWith("#") ? href.replace("#", "") : null;
@@ -234,9 +230,8 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
     "Providing high-quality non-medical home care services to improve the quality of life for our clients.";
   const footerQuickLinksSource = footer.quickLinks ?? navLinks;
   const footerQuickLinks: FooterQuickLink[] = footerQuickLinksSource
-    .filter(
-      (link): link is LinkItem & { label: string } =>
-        Boolean(link?.label)
+    .filter((link): link is LinkItem & { label: string } =>
+      Boolean(link?.label)
     )
     .map((link) => ({
       label: link.label as string,
@@ -514,9 +509,18 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
                       return (
                         <p
                           key={`${card.title ?? "contact-card"}-${lineIndex}`}
-                          className="mt-2 text-green-700 font-medium transition-colors hover:text-green-900"
+                          className="mt-2"
                         >
-                          <Link href={line.href ?? ""}>{line.value}</Link>
+                          {line.href ? (
+                            <Link
+                              className="text-green-700 font-medium transition-colors hover:text-green-900"
+                              href={line.href}
+                            >
+                              {line.value}
+                            </Link>
+                          ) : (
+                            line.value
+                          )}
                         </p>
                       );
                     })}
