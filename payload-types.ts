@@ -417,6 +417,7 @@ export interface HomePage {
           lines?:
             | {
                 value: string;
+                href?: string | null;
                 id?: string | null;
               }[]
             | null;
@@ -564,6 +565,7 @@ export interface HomePageSelect<T extends boolean = true> {
                 | T
                 | {
                     value?: T;
+                    href?: T;
                     id?: T;
                   };
               id?: T;

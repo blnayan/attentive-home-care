@@ -1,8 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  HomePageHeader,
+  type NavLinkItem,
+} from "@/components/home/home-page-header";
+import {
+  HomePageFooter,
+  type FooterContactInfo,
+  type FooterQuickLink,
+} from "@/components/home/home-page-footer";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -33,7 +43,7 @@ const ICON_MAP: Record<IconName, typeof Heart> = {
   mail: Mail,
 };
 
-const resolveMediaUrl = (media?: MediaItem | string | null) => {
+const resolveMediaUrl = (media?: MediaItem | number | string | null) => {
   if (!media) {
     return null;
   }
@@ -43,6 +53,10 @@ const resolveMediaUrl = (media?: MediaItem | string | null) => {
       return media;
     }
 
+    return null;
+  }
+
+  if (typeof media === "number") {
     return null;
   }
 
@@ -58,10 +72,10 @@ const resolveMediaUrl = (media?: MediaItem | string | null) => {
 };
 
 const resolveMediaAlt = (
-  media: MediaItem | string | null | undefined,
+  media: MediaItem | number | string | null | undefined,
   fallback: string
 ) => {
-  if (!media || typeof media === "string") {
+  if (!media || typeof media === "string" || typeof media === "number") {
     return fallback;
   }
 
@@ -126,13 +140,6 @@ const renderActionButton = (
   );
 };
 
-const formatLines = (card: ContactCard) => {
-  const lines = card.lines ?? [];
-  return lines
-    .map((line) => line.value)
-    .filter((value): value is string => Boolean(value));
-};
-
 export default function HomePageClient({ data }: { data: HomePageData }) {
   const navigation = data.navigation ?? {};
   const hero = data.hero ?? {};
@@ -144,6 +151,23 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
   const footer = data.footer ?? {};
 
   const navLinks = navigation.links ?? [];
+  const navigationLogoText =
+    navigation.logoText ?? "Attentive Home Care, Inc.";
+  const headerNavLinks: NavLinkItem[] = navLinks
+    .filter(
+      (link): link is LinkItem & { label: string } =>
+        Boolean(link.label)
+    )
+    .map((link) => {
+      const href = normalizeHref(link.href);
+      const sectionId = href.startsWith("#") ? href.replace("#", "") : null;
+
+      return {
+        label: link.label as string,
+        href,
+        sectionId,
+      };
+    });
   const [activeSection, setActiveSection] = useState("home");
 
   const sectionIds = useMemo(() => extractSectionIds(navLinks), [navLinks]);
@@ -195,6 +219,38 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
     href: navigation.phoneButton?.href ?? "tel:5714496448",
     icon: "phone",
   };
+  const headerNavigationCta = navigation.cta?.label
+    ? {
+        label: navigation.cta.label,
+        href: normalizeHref(navigation.cta.href),
+      }
+    : null;
+  const headerPhoneButtonNode = renderActionButton(headerPhoneButton, {
+    className: "bg-rose-600 hover:bg-rose-700",
+  });
+  const footerLogoText = footer.logoText ?? navigationLogoText;
+  const footerDescription =
+    footer.description ??
+    "Providing high-quality non-medical home care services to improve the quality of life for our clients.";
+  const footerQuickLinksSource = footer.quickLinks ?? navLinks;
+  const footerQuickLinks: FooterQuickLink[] = footerQuickLinksSource
+    .filter(
+      (link): link is LinkItem & { label: string } =>
+        Boolean(link?.label)
+    )
+    .map((link) => ({
+      label: link.label as string,
+      href: normalizeHref(link.href),
+    }));
+  const fallbackWebsiteUrl = "http://www.attentivehomecareva.com";
+  const fallbackWebsiteDisplay = "www.attentivehomecareva.com";
+  const websiteUrl = footer.contact?.website ?? fallbackWebsiteUrl;
+  const footerContact: FooterContactInfo = {
+    phone: footer.contact?.phone ?? "571-449-6448",
+    email: footer.contact?.email ?? "attentivehomecare55@gmail.com",
+    website: websiteUrl,
+    displayWebsite: footer.contact?.website ?? fallbackWebsiteDisplay,
+  };
 
   const heroPrimaryAction = hero.primaryAction ?? {
     label: "Our Services",
@@ -213,113 +269,15 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-50 w-full border-b bg-white">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <nav className="hidden items-center gap-6 md:flex">
-            <Link
-              href="#home"
-              className={cn(
-                "group flex items-center gap-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600",
-                activeSection === "home"
-                  ? "text-green-800"
-                  : "text-green-700 hover:text-green-800"
-              )}
-              aria-label="Go to Attentive Home Care home section"
-              aria-current={activeSection === "home" ? "page" : undefined}
-            >
-              {logoImageUrl ? (
-                <Image
-                  src={logoImageUrl}
-                  alt={logoImageAlt}
-                  width={180}
-                  height={48}
-                  className="h-10 w-auto"
-                  priority
-                />
-              ) : (
-                <>
-                  <Heart className="h-6 w-6 text-rose-600" />
-                  <span
-                    className={cn(
-                      "text-xl font-bold transition-colors group-hover:text-green-800",
-                      activeSection === "home"
-                        ? "text-green-800"
-                        : "text-green-700"
-                    )}
-                  >
-                    {navigation.logoText ?? "Attentive Home Care, Inc."}
-                  </span>
-                </>
-              )}
-            </Link>
-            {navLinks.map((link) => {
-              if (!link.label) {
-                return null;
-              }
-
-              const href = normalizeHref(link.href);
-              const sectionId = href.startsWith("#")
-                ? href.replace("#", "")
-                : null;
-
-              return (
-                <Link
-                  key={`${link.label}-${href}`}
-                  href={href}
-                  className={cn(
-                    "text-sm font-medium transition-colors",
-                    sectionId && activeSection === sectionId
-                      ? "text-green-800 underline decoration-2 decoration-green-700 underline-offset-4"
-                      : "text-gray-600 hover:text-green-700"
-                  )}
-                  aria-current={
-                    sectionId && activeSection === sectionId
-                      ? "page"
-                      : undefined
-                  }
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-            {navigation.cta?.label ? (
-              <Link
-                href={normalizeHref(navigation.cta.href)}
-                className="text-sm font-medium hover:text-green-700"
-              >
-                {navigation.cta.label}
-              </Link>
-            ) : null}
-          </nav>
-          <div className="hidden md:flex">
-            {renderActionButton(headerPhoneButton, {
-              className: "bg-rose-600 hover:bg-rose-700",
-            })}
-          </div>
-          <button
-            className="md:hidden"
-            type="button"
-            aria-label="Open navigation"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-6 w-6"
-            >
-              <line x1="4" x2="20" y1="12" y2="12" />
-              <line x1="4" x2="20" y1="6" y2="6" />
-              <line x1="4" x2="20" y1="18" y2="18" />
-            </svg>
-          </button>
-        </div>
-      </header>
+      <HomePageHeader
+        activeSection={activeSection}
+        logoImageUrl={logoImageUrl}
+        logoImageAlt={logoImageAlt}
+        navigationLogoText={navigationLogoText}
+        navLinks={headerNavLinks}
+        navigationCta={headerNavigationCta}
+        phoneActionButton={headerPhoneButtonNode}
+      />
       <main className="flex-1">
         <section
           id="home"
@@ -527,17 +485,21 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
             </div>
 
             <div className="mt-12 grid gap-8 md:grid-cols-3">
-              {contactCards.map((card) => {
+              {contactCards.map((card, index) => {
                 if (!card.title) {
                   return null;
                 }
 
                 const Icon = getIconComponent(card.icon ?? "phone");
-                const lines = formatLines(card);
+                const lines = card.lines;
+
+                if (lines == undefined) {
+                  return null;
+                }
 
                 return (
                   <div
-                    key={`${card.title}-${card.id ?? ""}`}
+                    key={`${card.title}-${card.id ?? index}`}
                     className="rounded-lg bg-white p-6 text-center shadow-md"
                   >
                     <div className="mb-4 mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
@@ -548,11 +510,16 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
                     <h3 className="text-xl font-bold text-gray-800">
                       {card.title}
                     </h3>
-                    {lines.map((line) => (
-                      <p key={line} className="mt-2 text-gray-600">
-                        {line}
-                      </p>
-                    ))}
+                    {lines.map((line, lineIndex) => {
+                      return (
+                        <p
+                          key={`${card.title ?? "contact-card"}-${lineIndex}`}
+                          className="mt-2 text-green-700 font-medium transition-colors hover:text-green-900"
+                        >
+                          <Link href={line.href ?? ""}>{line.value}</Link>
+                        </p>
+                      );
+                    })}
                   </div>
                 );
               })}
@@ -595,89 +562,12 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
           </div>
         </section>
       </main>
-      <footer className="bg-gray-900 py-12 text-white">
-        <div className="container mx-auto px-4">
-          <div className="grid gap-8 md:grid-cols-3">
-            <div>
-              <div className="mb-4 flex items-center gap-2">
-                <Heart className="h-6 w-6 text-rose-500" />
-                <span className="text-xl font-bold">
-                  {footer.logoText ??
-                    navigation.logoText ??
-                    "Attentive Home Care, Inc."}
-                </span>
-              </div>
-              <p className="text-gray-400">
-                {footer.description ??
-                  "Providing high-quality non-medical home care services to improve the quality of life for our clients."}
-              </p>
-            </div>
-            <div>
-              <h3 className="mb-4 text-lg font-bold">Quick Links</h3>
-              <ul className="space-y-2">
-                {(footer.quickLinks ?? navLinks).map((link) => {
-                  if (!link.label) {
-                    return null;
-                  }
-
-                  const href = normalizeHref(link.href);
-
-                  return (
-                    <li key={`${link.label}-${href}`}>
-                      <Link
-                        href={href}
-                        className="text-gray-400 transition-colors hover:text-white"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-            <div>
-              <h3 className="mb-4 text-lg font-bold">Contact Information</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-rose-500" />
-                  {footer.contact?.phone ?? "571-449-6448"}
-                </li>
-                <li className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-rose-500" />
-                  <Link
-                    href={`mailto:${
-                      footer.contact?.email ?? "attentivehomecare55@gmail.com"
-                    }`}
-                    className="transition-colors hover:text-white"
-                  >
-                    {footer.contact?.email ?? "attentivehomecare55@gmail.com"}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href={
-                      footer.contact?.website ??
-                      "http://www.attentivehomecareva.com"
-                    }
-                    className="text-gray-400 transition-colors hover:text-white"
-                  >
-                    {footer.contact?.website ?? "www.attentivehomecareva.com"}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-8 border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>
-              &copy; {new Date().getFullYear()}{" "}
-              {footer.logoText ??
-                navigation.logoText ??
-                "Attentive Home Care, Inc."}
-              . All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <HomePageFooter
+        logoText={footerLogoText}
+        description={footerDescription}
+        quickLinks={footerQuickLinks}
+        contact={footerContact}
+      />
     </div>
   );
 }

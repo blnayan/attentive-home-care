@@ -4,7 +4,7 @@ import payloadConfig from "@payload-config";
 import { getPayload } from "payload";
 
 export default async function HomePage() {
-  let data: HomePageData = {};
+  let data: HomePageData = {} as HomePageData;
 
   try {
     const payload = await getPayload({ config: payloadConfig });

@@ -100,23 +100,25 @@ const defaultContactCards = () => [
   {
     icon: "phone" as const,
     title: "Phone",
-    lines: [{ value: "571-449-6448" }, { value: "Fax: 571-449-3304" }],
+    lines: [
+      { value: "571-449-6448", href: "tel:5714496448" },
+      { value: "Fax: 571-449-3304", href: "tel:5714493304" },
+    ],
   },
   {
     icon: "mail" as const,
     title: "Email",
     lines: [
-      { value: "attentivehomecare55@gmail.com" },
-      { value: "www.attentivehomecareva.com" },
+      {
+        value: "attentivehomecare55@gmail.com",
+        href: "mailto:attentivehomecare55@gmail.com",
+      },
     ],
   },
   {
     icon: "home" as const,
-    title: "Location",
-    lines: [
-      { value: "Serving the Northern Virginia area" },
-      { value: "Call for a free consultation" },
-    ],
+    title: "In Person",
+    lines: [{ value: "Book an Appointment", href: "/book-appointment" }],
   },
 ];
 
@@ -480,6 +482,11 @@ const homePageGlobal: GlobalConfig = {
                   name: "value",
                   type: "text",
                   required: true,
+                },
+                {
+                  name: "href",
+                  label: "Link URL",
+                  type: "text",
                 },
               ],
             },
