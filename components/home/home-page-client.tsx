@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import ContactForm from "@/components/home/contact-form";
 import {
   HomePageHeader,
   type NavLinkItem,
@@ -26,7 +26,6 @@ import {
 } from "lucide-react";
 import type {
   ActionItem,
-  ContactCard,
   HomePageData,
   IconName,
   LinkItem,
@@ -166,7 +165,10 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
     });
   const [activeSection, setActiveSection] = useState("home");
 
-  const sectionIds = useMemo(() => extractSectionIds(navLinks), [navLinks]);
+  const sectionIds = useMemo(
+    () => extractSectionIds(navigation.links ?? []),
+    [navigation.links]
+  );
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -527,6 +529,10 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
                   </div>
                 );
               })}
+            </div>
+
+            <div className="mt-12 mx-auto w-full max-w-2xl">
+              <ContactForm />
             </div>
 
             {contact.cta?.label ? (
