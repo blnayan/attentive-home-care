@@ -1,6 +1,7 @@
 import type React from "react";
 import "@/app/(frontend)/globals.css";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -27,6 +28,12 @@ export default function RootLayout({
         >
           {children}
         </ThemeProvider>
+        {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ? (
+          <Script
+            src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
+            strategy="afterInteractive"
+          />
+        ) : null}
       </body>
     </html>
   );

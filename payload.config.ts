@@ -2,6 +2,7 @@ import sharp from "sharp";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
+import { resendAdapter } from "@payloadcms/email-resend";
 import { buildConfig } from "payload";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -13,6 +14,12 @@ const dirname = path.dirname(filename);
 
 export default buildConfig({
   editor: lexicalEditor(),
+  email: resendAdapter({
+    defaultFromAddress:
+      process.env.RESEND_FROM_ADDRESS || "ahc@attentivehomecare1.com",
+    defaultFromName: process.env.RESEND_FROM_NAME || "Attentive Home Care",
+    apiKey: process.env.RESEND_API_KEY || "",
+  }),
   collections,
   globals,
   secret: process.env.PAYLOAD_SECRET || "",

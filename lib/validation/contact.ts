@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const contactFormSchema = z
+const baseContactSchema = z
   .object({
     name: z
       .string()
@@ -36,4 +36,14 @@ export const contactFormSchema = z
   })
   .strict();
 
+const recaptchaSchema = z.object({
+  recaptchaToken: z
+    .string()
+    .min(1, "Verification failed. Please refresh the page and try again."),
+});
+
+export const contactFormSchema = baseContactSchema;
+export const contactSubmissionSchema = baseContactSchema.merge(recaptchaSchema);
+
 export type ContactFormValues = z.infer<typeof contactFormSchema>;
+export type ContactSubmissionValues = z.infer<typeof contactSubmissionSchema>;

@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { contactFormSchema, type ContactFormValues } from "@/lib/validation/contact";
+import {
+  contactFormSchema,
+  type ContactFormValues,
+} from "@/lib/validation/contact";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -14,6 +17,18 @@ import {
   FieldLabel,
   FieldMessage,
 } from "@/components/ui/field";
+
+declare global {
+  interface Window {
+    grecaptcha?: {
+      ready: (callback: () => void) => void;
+      execute: (
+        siteKey: string,
+        options: { action: string }
+      ) => Promise<string>;
+    };
+  }
+}
 
 type SubmissionState = {
   type: "success" | "error";
@@ -27,7 +42,8 @@ const defaultValues: Partial<ContactFormValues> = {
   message: "",
 };
 
-const sanitizePhoneDigits = (value: string) => value.replace(/\D/g, "").slice(0, 10);
+const sanitizePhoneDigits = (value: string) =>
+  value.replace(/\D/g, "").slice(0, 10);
 
 const formatPhoneDigits = (digits: string) => {
   if (digits.length === 0) {
@@ -46,7 +62,8 @@ const formatPhoneDigits = (digits: string) => {
 };
 
 export default function ContactForm() {
-  const [submissionState, setSubmissionState] = useState<SubmissionState | null>(null);
+  const [submissionState, setSubmissionState] =
+    useState<SubmissionState | null>(null);
   const {
     handleSubmit,
     register,
@@ -64,12 +81,42 @@ export default function ContactForm() {
     setSubmissionState(null);
 
     try {
+      const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+
+      if (!siteKey) {
+        throw new Error("reCAPTCHA site key is not configured.");
+      }
+
+      const token = await new Promise<string>((resolve, reject) => {
+        if (typeof window === "undefined") {
+          reject(new Error("reCAPTCHA can only run in the browser."));
+          return;
+        }
+
+        const grecaptcha = window.grecaptcha;
+
+        if (!grecaptcha) {
+          reject(new Error("reCAPTCHA has not loaded yet."));
+          return;
+        }
+
+        grecaptcha.ready(() => {
+          grecaptcha
+            .execute(siteKey, { action: "contact_form" })
+            .then(resolve)
+            .catch(reject);
+        });
+      });
+
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify({
+          ...values,
+          recaptchaToken: token,
+        }),
       });
 
       if (!response.ok) {
@@ -116,9 +163,12 @@ export default function ContactForm() {
 
   return (
     <div className="rounded-xl border border-green-100 bg-white/80 p-6 shadow-md backdrop-blur">
-      <h3 className="text-2xl font-semibold text-green-800">Send Us a Message</h3>
+      <h3 className="text-2xl font-semibold text-green-800">
+        Send Us a Message
+      </h3>
       <p className="mt-2 text-sm text-gray-600">
-        Use the form below to tell us how we can help. We&apos;ll respond as soon as possible.
+        Use the form below to tell us how we can help. We&apos;ll respond as
+        soon as possible.
       </p>
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -166,11 +216,15 @@ export default function ContactForm() {
                     maxLength={14}
                     value={formatPhoneDigits(digits)}
                     onChange={(event) => {
-                      const nextDigits = sanitizePhoneDigits(event.target.value);
+                      const nextDigits = sanitizePhoneDigits(
+                        event.target.value
+                      );
                       onChange(nextDigits);
                     }}
                     onBlur={(event) => {
-                      const nextDigits = sanitizePhoneDigits(event.target.value);
+                      const nextDigits = sanitizePhoneDigits(
+                        event.target.value
+                      );
                       onChange(nextDigits);
                       onBlur();
                     }}
@@ -180,7 +234,7 @@ export default function ContactForm() {
             }}
           />
           <FieldDescription className="text-xs text-gray-500">
-            Enter the 10-digit US phone number; it will be formatted automatically.
+            Enter your 10-digit US phone number; we&apos;ll format it for you.
           </FieldDescription>
           <FieldMessage />
         </Field>
@@ -188,7 +242,11 @@ export default function ContactForm() {
         <Field error={errors.message?.message}>
           <FieldLabel>How can we help?</FieldLabel>
           <FieldControl>
-            <Textarea rows={5} placeholder="Share any details or questions..." {...register("message")} />
+            <Textarea
+              rows={5}
+              placeholder="Share any details or questions..."
+              {...register("message")}
+            />
           </FieldControl>
           <FieldMessage />
         </Field>
