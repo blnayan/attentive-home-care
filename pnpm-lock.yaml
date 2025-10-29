@@ -14,9 +14,6 @@ importers:
       '@payloadcms/db-postgres':
         specifier: ^3.61.1
         version: 3.61.1(payload@3.61.1(graphql@16.11.0)(typescript@5.9.3))
-      '@payloadcms/email-nodemailer':
-        specifier: ^3.61.1
-        version: 3.61.1(payload@3.61.1(graphql@16.11.0)(typescript@5.9.3))
       '@payloadcms/email-resend':
         specifier: ^3.61.1
         version: 3.61.1(payload@3.61.1(graphql@16.11.0)(typescript@5.9.3))
@@ -149,9 +146,6 @@ importers:
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      nodemailer:
-        specifier: ^7.0.10
-        version: 7.0.10
       payload:
         specifier: ^3.61.1
         version: 3.61.1(graphql@16.11.0)(typescript@5.9.3)
@@ -1206,12 +1200,6 @@ packages:
 
   '@payloadcms/drizzle@3.61.1':
     resolution: {integrity: sha512-ERM+tqo15kKTLtZY76ysifNrmxc+mf14Xs/CcYi7F5sbo9yL66TQMKfsUvR7FFEphDsZU+6endToKqUY9/m39w==}
-    peerDependencies:
-      payload: 3.61.1
-
-  '@payloadcms/email-nodemailer@3.61.1':
-    resolution: {integrity: sha512-PpavLrcNQcpSQjGKLpQi7FvulwOpSFoWABiycTPWdVCWGI4RpgSJWmpefMa6Zj7dGbWL3chb6FrPiiAZWkzFLQ==}
-    engines: {node: ^18.20.2 || >=20.9.0}
     peerDependencies:
       payload: 3.61.1
 
@@ -3965,14 +3953,6 @@ packages:
   node-releases@2.0.26:
     resolution: {integrity: sha512-S2M9YimhSjBSvYnlr5/+umAnPHE++ODwt5e2Ij6FoX45HA/s4vHdkDx1eax2pAPeAOqu4s9b7ppahsyEFdVqQA==}
 
-  nodemailer@7.0.10:
-    resolution: {integrity: sha512-Us/Se1WtT0ylXgNFfyFSx4LElllVLJXQjWi2Xz17xWw7amDKO2MLtFnVp1WACy7GkVGs+oBlRopVNUzlrGSw1w==}
-    engines: {node: '>=6.0.0'}
-
-  nodemailer@7.0.9:
-    resolution: {integrity: sha512-9/Qm0qXIByEP8lEV2qOqcAW7bRpL8CR9jcTwk3NBnHJNmP9fIJ86g2fgmIXqHY+nj55ZEMwWqYAT2QTDpRUYiQ==}
-    engines: {node: '>=6.0.0'}
-
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
     engines: {node: '>=0.10.0'}
@@ -6138,11 +6118,6 @@ snapshots:
       - prisma
       - sql.js
       - sqlite3
-
-  '@payloadcms/email-nodemailer@3.61.1(payload@3.61.1(graphql@16.11.0)(typescript@5.9.3))':
-    dependencies:
-      nodemailer: 7.0.9
-      payload: 3.61.1(graphql@16.11.0)(typescript@5.9.3)
 
   '@payloadcms/email-resend@3.61.1(payload@3.61.1(graphql@16.11.0)(typescript@5.9.3))':
     dependencies:
@@ -9313,10 +9288,6 @@ snapshots:
       - babel-plugin-macros
 
   node-releases@2.0.26: {}
-
-  nodemailer@7.0.10: {}
-
-  nodemailer@7.0.9: {}
 
   normalize-path@3.0.0: {}
 

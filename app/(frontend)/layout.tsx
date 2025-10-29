@@ -3,6 +3,7 @@ import "@/app/(frontend)/globals.css";
 import { Inter } from "next/font/google";
 import Script from "next/script";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,6 +35,7 @@ export default function RootLayout({
             strategy="afterInteractive"
           />
         ) : null}
+        <Analytics />
       </body>
     </html>
   );
