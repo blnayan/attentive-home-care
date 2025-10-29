@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import type { GlobalConfig } from "payload";
 
 const iconOptions = [
@@ -146,6 +147,13 @@ const homePageGlobal: GlobalConfig = {
   label: "Home Page",
   access: {
     read: () => true,
+  },
+  hooks: {
+    afterChange: [
+      (ctx) => {
+        revalidatePath("/");
+      },
+    ],
   },
   fields: [
     {
