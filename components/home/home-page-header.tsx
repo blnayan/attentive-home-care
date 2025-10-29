@@ -1,7 +1,9 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { useState, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { Heart, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type NavLinkItem = {
@@ -34,9 +36,57 @@ export function HomePageHeader({
   navigationCta,
   phoneActionButton,
 }: HomePageHeaderProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen((previous) => !previous);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
+  const mobileNavId = "home-page-mobile-nav";
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        <div className="flex w-full items-center md:hidden">
+          <button
+            className="mr-2 rounded-md p-2 text-gray-700 transition-colors hover:text-green-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+            type="button"
+            onClick={toggleMenu}
+            aria-label={isMenuOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={isMenuOpen}
+            aria-controls={mobileNavId}
+          >
+            <Menu className="h-6 w-6" aria-hidden="true" />
+          </button>
+          <Link
+            href="#home"
+            className="mx-auto flex items-center gap-2"
+            onClick={closeMenu}
+            aria-label="Go to Attentive Home Care home section"
+          >
+            {logoImageUrl ? (
+              <Image
+                src={logoImageUrl}
+                alt={logoImageAlt}
+                width={180}
+                height={48}
+                className="h-10 w-auto"
+                priority
+              />
+            ) : (
+              <>
+                <Heart className="h-6 w-6 text-rose-600" />
+                <span className="text-lg font-bold text-green-700">
+                  {navigationLogoText}
+                </span>
+              </>
+            )}
+          </Link>
+        </div>
         <nav className="hidden items-center gap-6 md:flex">
           <Link
             href="#home"
@@ -103,25 +153,40 @@ export function HomePageHeader({
           ) : null}
         </nav>
         <div className="hidden md:flex">{phoneActionButton}</div>
-        <button className="md:hidden" type="button" aria-label="Open navigation">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-6 w-6"
-          >
-            <line x1="4" x2="20" y1="12" y2="12" />
-            <line x1="4" x2="20" y1="6" y2="6" />
-            <line x1="4" x2="20" y1="18" y2="18" />
-          </svg>
-        </button>
       </div>
+      {isMenuOpen ? (
+        <div className="border-b bg-white shadow-sm md:hidden">
+          <nav
+            id={mobileNavId}
+            className="container mx-auto flex flex-col gap-3 px-4 pb-6 pt-4"
+          >
+            {navLinks.map((link) => (
+              <Link
+                key={`mobile-${link.label}-${link.href}`}
+                href={link.href}
+                className="text-sm font-medium text-gray-700 transition-colors hover:text-green-700"
+                onClick={closeMenu}
+              >
+                {link.label}
+              </Link>
+            ))}
+            {navigationCta?.label ? (
+              <Link
+                href={navigationCta.href}
+                className="text-sm font-medium text-gray-700 transition-colors hover:text-green-700"
+                onClick={closeMenu}
+              >
+                {navigationCta.label}
+              </Link>
+            ) : null}
+            {phoneActionButton ? (
+              <div className="pt-2" onClick={closeMenu}>
+                {phoneActionButton}
+              </div>
+            ) : null}
+          </nav>
+        </div>
+      ) : null}
     </header>
   );
 }

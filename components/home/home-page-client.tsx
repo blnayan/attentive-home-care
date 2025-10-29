@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ContactForm from "@/components/home/contact-form";
@@ -97,19 +96,6 @@ const getIconComponent = (icon?: IconName | null) => {
   return ICON_MAP[icon] ?? null;
 };
 
-const extractSectionIds = (links: LinkItem[]) => {
-  return Array.from(
-    new Set<string>([
-      "home",
-      ...links
-        .map((link) => link.href)
-        .filter((href): href is string => Boolean(href))
-        .filter((href) => href.startsWith("#"))
-        .map((href) => href.replace("#", "")),
-    ])
-  );
-};
-
 const renderActionButton = (
   action: ActionItem | null | undefined,
   {
@@ -163,37 +149,6 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
         sectionId,
       };
     });
-  const [activeSection, setActiveSection] = useState("home");
-
-  const sectionIds = useMemo(
-    () => extractSectionIds(navigation.links ?? []),
-    [navigation.links]
-  );
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
-      {
-        rootMargin: "-40% 0px -40% 0px",
-        threshold: 0.1,
-      }
-    );
-
-    sectionIds.forEach((id) => {
-      const element = document.getElementById(id);
-      if (element) {
-        observer.observe(element);
-      }
-    });
-
-    return () => observer.disconnect();
-  }, [sectionIds]);
 
   const logoImageUrl = resolveMediaUrl(navigation.logoImage);
   const logoImageAlt = resolveMediaAlt(
@@ -267,7 +222,7 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
   return (
     <div className="flex min-h-screen flex-col">
       <HomePageHeader
-        activeSection={activeSection}
+        activeSection=""
         logoImageUrl={logoImageUrl}
         logoImageAlt={logoImageAlt}
         navigationLogoText={navigationLogoText}
@@ -278,7 +233,7 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
       <main className="flex-1">
         <section
           id="home"
-          className="relative bg-gradient-to-r from-green-50 to-rose-50 py-20"
+          className="relative bg-gradient-to-r from-green-50 to-rose-50 py-20 scroll-mt-16"
         >
           <div className="container mx-auto flex flex-col items-center gap-10 px-4 md:flex-row md:gap-12">
             <div className="space-y-6">
@@ -317,7 +272,7 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
           </div>
         </section>
 
-        <section id="about" className="bg-white py-16">
+        <section id="about" className="bg-white py-16 scroll-mt-16">
           <div className="container mx-auto px-4">
             <div className="grid gap-8 md:grid-cols-2 md:items-stretch">
               <div className="flex h-full flex-col rounded-2xl border border-green-100 bg-green-50/60 p-8 shadow-sm">
@@ -352,7 +307,7 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
           </div>
         </section>
 
-        <section id="services" className="bg-rose-50 py-16">
+        <section id="services" className="bg-rose-50 py-16 scroll-mt-16">
           <div className="container mx-auto px-4">
             <div className="mb-12 text-center">
               {servicesSection.badge ? (
@@ -469,7 +424,7 @@ export default function HomePageClient({ data }: { data: HomePageData }) {
           </div>
         </section>
 
-        <section id="contact" className="bg-green-50 py-16">
+        <section id="contact" className="bg-green-50 py-16 scroll-mt-16">
           <div className="container mx-auto px-4">
             <div className="text-center">
               <h2 className="text-3xl font-bold text-green-800">
