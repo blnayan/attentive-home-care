@@ -234,7 +234,7 @@ export default function ContactForm() {
             }}
           />
           <FieldDescription className="text-xs text-gray-500">
-            Enter your 10-digit US phone number; we&apos;ll format it for you.
+            Enter your 10-digit US phone number.
           </FieldDescription>
           <FieldMessage />
         </Field>
