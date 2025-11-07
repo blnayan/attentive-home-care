@@ -4,7 +4,7 @@ import { InlineWidget } from "react-calendly";
 
 export default function BookAppointment() {
   return (
-    <div>
+    <div className="h-screen">
       <InlineWidget url="https://calendly.com/bijonsingh381/new-meeting" />
     </div>
   );
